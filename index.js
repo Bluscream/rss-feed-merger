@@ -50,6 +50,7 @@ app.get('/', async (req, res) => {
     const reqUrl = req.protocol + '://' + req.get('host') + req.originalUrl;
     if (reqUrl === "http://rssmerge.onrender.com/") return;
     log(`Request Url is ${reqUrl}`);
+    const reqUrlHash = crypto.createHash('md5').update(reqUrl).digest('hex');
     const selfLink = [{
         $: {
             href: reqUrl,
@@ -72,6 +73,7 @@ app.get('/', async (req, res) => {
         updated: new Date().toISOString(),
         title: param_title,
         subtitle: param_subtitle,
+        id: reqUrlHash,
         entry: []
     };
     const param_noformat = get_key('format', false);
@@ -96,7 +98,7 @@ app.get('/', async (req, res) => {
                 const parsedResponse = await parseStringPromise(cachedData, { explicitRoot: true/*=feed*/, valueProcessors: [strip] });
                 const feed = parsedResponse.feed; // err
                 if (feed) {
-                    if (feed.hasOwnProperty("id")) combinedFeed.id = feed.id;
+                    // if (feed.hasOwnProperty("id")) combinedFeed.id = feed.id;
                     const feedEntries = feed.entry;
                     if (param_mode === 'single') {
                         if (feedEntries && feedEntries.length > 0) {
