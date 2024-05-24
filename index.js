@@ -1,4 +1,4 @@
-const PORT = process.env.PORT || 21578;
+const PORT = process.env.PORT || 80;
 const cacheTTL = 10 * 60 * 1000; // 10 minutes
 const cachePath = '.cache';
 
