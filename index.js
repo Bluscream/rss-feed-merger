@@ -99,8 +99,11 @@ app.get('/', async (req, res) => {
                 const feed = parsedResponse.feed; // err
                 if (feed) {
                     // if (feed.hasOwnProperty("id")) combinedFeed.id = feed.id;
-                    const feedUrl = new URL(feed.link[0].$.href);
-                    const feedBaseUrl = `${urlObject.protocol}//${urlObject.hostname}`;
+                    let feedUrl, feedBaseUrl;
+                    if (feed.link && feed.link.length > 0) {
+                        feedUrl = new URL(feed.link[0].$.href);
+                        feedBaseUrl = `${feedUrl.protocol}//${feedUrl.hostname}`;
+                    }
                     const feedEntries = feed.entry;
                     if (param_mode === 'single') {
                         if (feedEntries && feedEntries.length > 0) {
