@@ -106,7 +106,8 @@ app.get('/', async (req, res) => {
                         for (const entry of feedEntries) {
                             if (entry.title) entry.title = entry.title.toString().trim();
                             if (entry.hasOwnProperty("summary")) {
-                                if (getText(entry.summary).strip() == "") delete o['summary'];
+                                const txt = getText(entry.summary);
+                                if (txt && txt.strip() == "") delete o['summary'];
                             }
                             combinedFeed.entry.push(entry);
                         }
