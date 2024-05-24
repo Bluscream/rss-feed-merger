@@ -1,4 +1,3 @@
-const port = process.env.PORT || 8080;
 const cacheTTL = 10 * 60 * 1000; // 10 minutes
 const cachePath = '.cache';
 
@@ -36,6 +35,7 @@ function strip(value) {
 }
 
 const app = express();
+const port = process.env.PORT || 8081;
 app.use(express.urlencoded({ extended: true }));
 
 app.get('/', async (req, res) => {
