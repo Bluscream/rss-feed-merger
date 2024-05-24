@@ -129,6 +129,7 @@ app.get('/', async (req, res) => {
                                 if (feed.title) entry["feed:title"] = feed.title;
                                 if (feed.link) {
                                     entry["feed:site"] = feedUrl.hostname;
+                                    entry["feed:base"] = feedBaseUrl;
                                     entry["feed:icon"] = `https://www.google.com/s2/favicons?domain=${feedBaseUrl}&sz=256`;
                                 }
                                 combinedFeed.entry.push(entry);
