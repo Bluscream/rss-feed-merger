@@ -128,7 +128,7 @@ app.get('/', async (req, res) => {
                                 }
                                 if (feed.title) entry["feed:title"] = feed.title;
                                 if (feed.link) {
-                                    var site = getBaseUrl(feed.link[0]._.href);
+                                    var site = getBaseUrl(feed.link[0].$.href);
                                     entry["feed:site"] = site;
                                     entry["feed:icon"] = `https://www.google.com/s2/favicons?domain=${site}&sz=256`;
                                 }
