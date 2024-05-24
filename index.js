@@ -55,7 +55,7 @@ app.get('/', async (req, res) => {
         $: { xmlns: 'http://www.w3.org/2005/Atom', "xmlns:media": "http://search.yahoo.com/mrss/", "xml:lang": "en-US" },
         // xml: {encoding: "UTF-8"},
         link: selfLink,
-        "atom:link": selfLink,
+        // "atom:link": selfLink,
         updated: [new Date().toISOString()],
         entry: []
     };
