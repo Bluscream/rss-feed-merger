@@ -44,7 +44,7 @@ const port = process.env.PORT || 9988;
 app.use(express.urlencoded({ extended: true }));
 
 app.get('/', async (req, res) => {
-    function get(key, defaultValue = null) {
+    function get_key(key, defaultValue = null) {
         return req.query[key]!== undefined? req.query[key] : defaultValue;
     }
     const reqUrl = req.protocol + '://' + req.get('host') + req.originalUrl;
@@ -56,10 +56,11 @@ app.get('/', async (req, res) => {
             type: "application/atom+xml"
         }
     }];
-    const param_urls = get("urls",[])?.split(',') ?? [];
+    const param_urls = [];
+    if (param_urls) param_urls = get_key("urls",[]).split(',') ?? [];
     log(`Got ${param_urls.length} urls: ${param_urls.join()}`)
-    const param_title = get("title",`${param_urls.length} Atom Feeds`);
-    const param_subtitle = get("subtitle",`A combination of ${param_urls.length} Atom feeds`);
+    const param_title = get_key("title",`${param_urls.length} Atom Feeds`);
+    const param_subtitle = get_key("subtitle",`A combination of ${param_urls.length} Atom feeds`);
     log(`Title: ${param_title} | Subtitle: ${param_subtitle}`);
     let combinedFeed = {
         $: { xmlns: 'http://www.w3.org/2005/Atom', "xmlns:media": "http://search.yahoo.com/mrss/", "xml:lang": "en-US" },
@@ -71,12 +72,12 @@ app.get('/', async (req, res) => {
         subtitle: param_subtitle,
         entry: []
     };
-    const param_noformat = get('format', false);
+    const param_noformat = get_key('format', false);
     const builder = new Builder({explicitRoot: true, rootName: "feed", renderOpts: { pretty: !param_noformat, indent: ' ', newline: '\n' }});
     try {
         log('Combining Atom feeds...');
         res.setHeader('Content-Type', 'application/xml');
-        const param_mode = get('mode', 'single');
+        const param_mode = get_key('mode', 'single');
         log(`Mode: ${param_mode} | Format: ${!param_noformat}`);
 
         if (param_mode === 'single') {
