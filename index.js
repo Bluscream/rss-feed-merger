@@ -35,16 +35,28 @@ function strip(value) {
 }
 
 const app = express();
-const port = process.env.PORT || 8081;
+const port = process.env.PORT || 9988;
 app.use(express.urlencoded({ extended: true }));
 
 app.get('/', async (req, res) => {
     function get(key, defaultValue = null) {
         return req.query[key]!== undefined? req.query[key] : defaultValue;
     }
+    const reqUrl = req.protocol + '://' + req.get('host') + req.originalUrl;
+    log(`Request Url is ${reqUrl}`);
+    const selfLink = [{
+        $: {
+            href: reqUrl,
+            rel: ["self"],
+            type: "application/atom+xml"
+        }
+    }];
     let combinedFeed = {
-        // $: { xmlns: 'http://www.w3.org/2005/Atom' },
-        // xml: {encoding: "UTF-8"}
+        $: { xmlns: 'http://www.w3.org/2005/Atom', "xmlns:media": "http://search.yahoo.com/mrss/", "xml:lang": "en-US" },
+        // xml: {encoding: "UTF-8"},
+        link: selfLink,
+        "atom:link": selfLink,
+        updated: [new Date().toISOString()],
         entry: []
     };
     const param_noformat = get('format', false);
@@ -52,8 +64,6 @@ app.get('/', async (req, res) => {
     try {
         log('Combining Atom feeds...');
         res.setHeader('Content-Type', 'application/xml');
-        const reqUrl = req.protocol + '://' + req.get('host') + req.originalUrl;
-        log(`Request Url is ${reqUrl}`);
         const param_urls = req.query.urls.split(',');
         log(`Got ${param_urls.length} urls: ${param_urls.join()}`)
         const param_mode = req.query.mode || 'single'; // Default to 'single' if not specified
@@ -65,14 +75,6 @@ app.get('/', async (req, res) => {
         if (param_mode === 'single') {
             combinedFeed.title = [param_title]; // Flattening the title array to a string
             combinedFeed.subtitle = [param_subtitle]; // Flattening the subtitle array to a string
-            combinedFeed.link = [{
-                $: {
-                    href: reqUrl,
-                    rel: ["self"],
-                    type: "application/atom+xml"
-                }
-            }];
-            combinedFeed.updated = [new Date().toISOString()]; // Flattening the updated array to a string
         }
 
         log(combinedFeed);
