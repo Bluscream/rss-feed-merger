@@ -4,7 +4,6 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
   "author": "",
@@ -13,12 +12,7 @@
     "axios": "^1.7.2",
     "cache-manager": "^5.5.3",
     "cache-manager-fs-hash": "^2.0.0",
-    "debug": "^4.3.4",
     "express": "^4.19.2",
-    "jsdom": "^24.0.0",
-    "xml-formatter": "^3.6.2",
-    "xml2js": "^0.6.2",
-    "xmlbuilder": "^15.1.1",
-    "xmlbuilder2": "^3.1.1"
+    "xml2js": "^0.6.2"
   }
 }
