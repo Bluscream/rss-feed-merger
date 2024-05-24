@@ -91,7 +91,7 @@ app.get('/', async (req, res) => {
                         combinedFeed.link.push({
                             $: {
                                 href: url,
-                                rel: ["source"],
+                                rel: ["related"],
                                 type: "application/atom+xml"
                             }
                         });
