@@ -56,7 +56,7 @@ app.get('/', async (req, res) => {
             type: "application/atom+xml"
         }
     }];
-    const param_urls = get_key("urls");
+    let param_urls = get_key("urls");
     if (param_urls) param_urls = param_urls.split(',');
     else return;
     log(`Got ${param_urls.length} urls: ${param_urls.join()}`)
