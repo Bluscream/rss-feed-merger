@@ -48,7 +48,7 @@ app.get('/', async (req, res) => {
         return req.query[key]!== undefined? req.query[key] : defaultValue;
     }
     const reqUrl = req.protocol + '://' + req.get('host') + req.originalUrl;
-    if (reqUrl == "http://rssmerge.onrender.com/") return;
+    if (reqUrl === "http://rssmerge.onrender.com/") return;
     log(`Request Url is ${reqUrl}`);
     const selfLink = [{
         $: {
