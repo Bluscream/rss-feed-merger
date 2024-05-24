@@ -38,11 +38,6 @@ var getText = function (elt) {
     if (typeof (elt) === 'object' && elt.hasOwnProperty('_')) return elt._;
     return ''; // or whatever makes sense for your case
 }
-var getBaseUrl = function (url) {
-    const urlObject = new URL(url);
-    const formattedUrl = `${urlObject.protocol}//${urlObject.hostname}`;
-    return formattedUrl;
-}
 
 const app = express();
 const port = process.env.PORT || 9988;
@@ -104,6 +99,8 @@ app.get('/', async (req, res) => {
                 const feed = parsedResponse.feed; // err
                 if (feed) {
                     // if (feed.hasOwnProperty("id")) combinedFeed.id = feed.id;
+                    const feedUrl = new URL(feed.link[0].$.href);
+                    const feedBaseUrl = `${urlObject.protocol}//${urlObject.hostname}`;
                     const feedEntries = feed.entry;
                     if (param_mode === 'single') {
                         if (feedEntries && feedEntries.length > 0) {
@@ -128,9 +125,8 @@ app.get('/', async (req, res) => {
                                 }
                                 if (feed.title) entry["feed:title"] = feed.title;
                                 if (feed.link) {
-                                    var site = getBaseUrl(feed.link[0].$.href);
-                                    entry["feed:site"] = site;
-                                    entry["feed:icon"] = `https://www.google.com/s2/favicons?domain=${site}&sz=256`;
+                                    entry["feed:site"] = feedUrl.hostname;
+                                    entry["feed:icon"] = `https://www.google.com/s2/favicons?domain=${feedBaseUrl}&sz=256`;
                                 }
                                 combinedFeed.entry.push(entry);
                             }
