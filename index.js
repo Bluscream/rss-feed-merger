@@ -57,7 +57,8 @@ app.get('/', async (req, res) => {
         }
     }];
     const param_urls = get_key("urls");
-    if (param_urls) param_urls = param_urls.split(',') ?? [];
+    if (param_urls) param_urls = param_urls.split(',');
+    else return;
     log(`Got ${param_urls.length} urls: ${param_urls.join()}`)
     const param_title = get_key("title",`${param_urls.length} Atom Feeds`);
     const param_subtitle = get_key("subtitle",`A combination of ${param_urls.length} Atom feeds`);
