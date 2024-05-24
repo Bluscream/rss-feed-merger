@@ -1,4 +1,4 @@
-const PORT = process.env.PORT || 80;
+const port = process.env.PORT || 8080;
 const cacheTTL = 10 * 60 * 1000; // 10 minutes
 const cachePath = '.cache';
 
@@ -130,6 +130,6 @@ app.get('/', async (req, res) => {
     }
 });
 
-app.listen(PORT, () => {
-    log(`Atom Combiner listening at http://*:${PORT}`);
+app.listen(port, () => {
+    log(`Atom Combiner listening at http://*:${port}`);
 });
