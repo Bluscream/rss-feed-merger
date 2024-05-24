@@ -56,10 +56,10 @@ app.get('/', async (req, res) => {
             type: "application/atom+xml"
         }
     }];
-    const param_urls = req.query.urls.split(',');
+    const param_urls = get("urls",[])?.split(',');
     log(`Got ${param_urls.length} urls: ${param_urls.join()}`)
-    const param_title = req.query.title || `${param_urls.length} Atom Feeds`;
-    const param_subtitle = req.query.subtitle || `A combination of ${param_urls.length} Atom feeds`;
+    const param_title = get("title",`${param_urls.length} Atom Feeds`);
+    const param_subtitle = get("subtitle",`A combination of ${param_urls.length} Atom feeds`);
     log(`Title: ${param_title} | Subtitle: ${param_subtitle}`);
     let combinedFeed = {
         $: { xmlns: 'http://www.w3.org/2005/Atom', "xmlns:media": "http://search.yahoo.com/mrss/", "xml:lang": "en-US" },
@@ -76,8 +76,8 @@ app.get('/', async (req, res) => {
     try {
         log('Combining Atom feeds...');
         res.setHeader('Content-Type', 'application/xml');
-        const param_mode = req.query.mode || 'single'; // Default to 'single' if not specified
-        log(`Mode: ${param_mode} | Format: ${param_noformat}`);
+        const param_mode = get('mode', 'single');
+        log(`Mode: ${param_mode} | Format: ${!param_noformat}`);
 
         if (param_mode === 'single') {
         }
