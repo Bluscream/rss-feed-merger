@@ -56,7 +56,7 @@ app.get('/', async (req, res) => {
             type: "application/atom+xml"
         }
     }];
-    const param_urls = get("urls",[])?.split(',');
+    const param_urls = get("urls",[])?.split(',') ?? [];
     log(`Got ${param_urls.length} urls: ${param_urls.join()}`)
     const param_title = get("title",`${param_urls.length} Atom Feeds`);
     const param_subtitle = get("subtitle",`A combination of ${param_urls.length} Atom feeds`);
