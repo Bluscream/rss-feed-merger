@@ -31,11 +31,11 @@ function log(msg) {
     // }
 }
 function strip(value) {
-    return value?.toString()?.trim()?? null;
+    return value?.toString()?.trim() ?? null;
 }
-var getText = function(elt) {
-    if (typeof(elt) === 'string') return elt;
-    if (typeof(elt) === 'object' && elt.hasOwnProperty('_')) return elt._;
+var getText = function (elt) {
+    if (typeof (elt) === 'string') return elt;
+    if (typeof (elt) === 'object' && elt.hasOwnProperty('_')) return elt._;
     return ''; // or whatever makes sense for your case
 }
 
@@ -45,7 +45,7 @@ app.use(express.urlencoded({ extended: true }));
 
 app.get('/', async (req, res) => {
     function get_key(key, defaultValue = null) {
-        return req.query[key]!== undefined? req.query[key] : defaultValue;
+        return req.query[key] !== undefined ? req.query[key] : defaultValue;
     }
     const reqUrl = req.protocol + '://' + req.get('host') + req.originalUrl;
     if (reqUrl === "http://rssmerge.onrender.com/") return;
@@ -61,8 +61,8 @@ app.get('/', async (req, res) => {
     if (param_urls) param_urls = param_urls.split(',');
     else return;
     log(`Got ${param_urls.length} urls: ${param_urls.join()}`)
-    const param_title = get_key("title",`${param_urls.length} Atom Feeds`);
-    const param_subtitle = get_key("subtitle",`A combination of ${param_urls.length} Atom feeds`);
+    const param_title = get_key("title", `${param_urls.length} Atom Feeds`);
+    const param_subtitle = get_key("subtitle", `A combination of ${param_urls.length} Atom feeds`);
     log(`Title: ${param_title} | Subtitle: ${param_subtitle}`);
     let combinedFeed = {
         $: { xmlns: 'http://www.w3.org/2005/Atom', "xmlns:media": "http://search.yahoo.com/mrss/", "xml:lang": "en-US" },
@@ -75,7 +75,8 @@ app.get('/', async (req, res) => {
         entry: []
     };
     const param_noformat = get_key('format', false);
-    const builder = new Builder({explicitRoot: true, rootName: "feed", renderOpts: { pretty: !param_noformat, indent: ' ', newline: '\n' }});
+    const builder = new Builder({ explicitRoot: true, rootName: "feed", renderOpts: { pretty: !param_noformat, indent: ' ', newline: '\n' } });
+    let lastUrl = "";
     try {
         log('Combining Atom feeds...');
         res.setHeader('Content-Type', 'application/xml');
@@ -88,37 +89,56 @@ app.get('/', async (req, res) => {
         // log(combinedFeed);
 
         for (const url of param_urls) {
-            log(`Fetching ${url}...`);
-            const cachedData = await fetchAndCache(url);
-            const parsedResponse = await parseStringPromise(cachedData, {explicitRoot: true/*=feed*/, valueProcessors: [strip]});
-            const feed = parsedResponse.feed; // err
-            if (feed) {
-                const feedEntries = feed.entry;
-                if (param_mode === 'single') {
-                    if (feedEntries && feedEntries.length > 0) {
-                        combinedFeed.link.push({
-                            $: {
-                                href: url,
-                                rel: ["related"],
-                                type: "application/atom+xml"
+            try {
+                log(`Fetching ${url}...`);
+                lastUrl = url;
+                const cachedData = await fetchAndCache(url);
+                const parsedResponse = await parseStringPromise(cachedData, { explicitRoot: true/*=feed*/, valueProcessors: [strip] });
+                const feed = parsedResponse.feed; // err
+                if (feed) {
+                    if (feed.hasOwnProperty("id")) combinedFeed.id = feed.id;
+                    const feedEntries = feed.entry;
+                    if (param_mode === 'single') {
+                        if (feedEntries && feedEntries.length > 0) {
+                            combinedFeed.link.push({
+                                $: {
+                                    href: url,
+                                    rel: ["related"],
+                                    type: "application/atom+xml"
+                                }
+                            });
+                            for (const entry of feedEntries) {
+                                if (entry.title) entry.title = entry.title.toString().trim();
+                                if (entry.hasOwnProperty("author")) {
+                                    if (entry.author.hasOwnProperty("name")) {
+                                        const txt = getText(entry.author.name);
+                                        if (txt && txt == "") entry.author.name = "Unknown";
+                                    }
+                                }
+                                if (entry.hasOwnProperty("summary")) {
+                                    const txt = getText(entry.summary);
+                                    if (txt && txt.strip() == "") entry.summary = "empty";
+                                }
+                                combinedFeed.entry.push(entry);
                             }
-                        });
-                        for (const entry of feedEntries) {
-                            if (entry.title) entry.title = entry.title.toString().trim();
-                            if (entry.hasOwnProperty("summary")) {
-                                const txt = getText(entry.summary);
-                                if (txt && txt.strip() == "") delete o['summary'];
-                            }
-                            combinedFeed.entry.push(entry);
+                        } else {
+                            log(`No <entry> elements in ${feed.title}`);
                         }
                     } else {
-                        log(`No <entry> elements in ${feed.title}`);
+                        throw ("mode not supported!");
                     }
                 } else {
-                    throw("mode not supported!");
+                    log(`No <feed> elements in ${url}`);
                 }
-            } else {
-                log(`No <feed> elements in ${url}`);
+            } catch (error) {
+                const err = error.toString();
+                log(error);
+                combinedFeed.error = [err];
+                combinedFeed.entry.push({
+                    title: err,
+                    summary: error.stack,
+                    url: lastUrl
+                });
             }
         }
 
@@ -131,7 +151,8 @@ app.get('/', async (req, res) => {
         combinedFeed.error = [err];
         combinedFeed.entry.push({
             title: err,
-            summary: error.stack
+            summary: error.stack,
+            url: lastUrl
         });
         const xmlString = builder.buildObject(combinedFeed);
         res.status(500).send(xmlString);
