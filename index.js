@@ -56,6 +56,8 @@ app.get('/', async (req, res) => {
             type: "application/atom+xml"
         }
     }];
+    const param_urls = req.query.urls.split(',');
+    log(`Got ${param_urls.length} urls: ${param_urls.join()}`)
     const param_title = req.query.title || `${param_urls.length} Atom Feeds`;
     const param_subtitle = req.query.subtitle || `A combination of ${param_urls.length} Atom feeds`;
     log(`Title: ${param_title} | Subtitle: ${param_subtitle}`);
@@ -74,8 +76,6 @@ app.get('/', async (req, res) => {
     try {
         log('Combining Atom feeds...');
         res.setHeader('Content-Type', 'application/xml');
-        const param_urls = req.query.urls.split(',');
-        log(`Got ${param_urls.length} urls: ${param_urls.join()}`)
         const param_mode = req.query.mode || 'single'; // Default to 'single' if not specified
         log(`Mode: ${param_mode} | Format: ${param_noformat}`);
 
