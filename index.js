@@ -38,6 +38,11 @@ var getText = function (elt) {
     if (typeof (elt) === 'object' && elt.hasOwnProperty('_')) return elt._;
     return ''; // or whatever makes sense for your case
 }
+var getBaseUrl = function (url) {
+    const urlObject = new URL(url);
+    const formattedUrl = `${urlObject.protocol}//${urlObject.hostname}`;
+    return formattedUrl;
+}
 
 const app = express();
 const port = process.env.PORT || 9988;
@@ -120,6 +125,12 @@ app.get('/', async (req, res) => {
                                 if (entry.hasOwnProperty("summary")) {
                                     const txt = getText(entry.summary);
                                     if (txt && txt.strip() == "") entry.summary = "empty";
+                                }
+                                if (feed.title) entry["feed:title"] = feed.title;
+                                if (feed.link) {
+                                    var site = getBaseUrl(feed.link[0]._.href);
+                                    entry["feed:site"] = site;
+                                    entry["feed:icon"] = `https://www.google.com/s2/favicons?domain=${site}&sz=256`;
                                 }
                                 combinedFeed.entry.push(entry);
                             }
