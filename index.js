@@ -33,6 +33,11 @@ function log(msg) {
 function strip(value) {
     return value?.toString()?.trim()?? null;
 }
+var getText = function(elt) {
+    if (typeof(elt) === 'string') return elt;
+    if (typeof(elt) === 'object' && elt.hasOwnProperty('_')) return elt._;
+    return ''; // or whatever makes sense for your case
+}
 
 const app = express();
 const port = process.env.PORT || 9988;
@@ -51,12 +56,17 @@ app.get('/', async (req, res) => {
             type: "application/atom+xml"
         }
     }];
+    const param_title = req.query.title || `${param_urls.length} Atom Feeds`;
+    const param_subtitle = req.query.subtitle || `A combination of ${param_urls.length} Atom feeds`;
+    log(`Title: ${param_title} | Subtitle: ${param_subtitle}`);
     let combinedFeed = {
         $: { xmlns: 'http://www.w3.org/2005/Atom', "xmlns:media": "http://search.yahoo.com/mrss/", "xml:lang": "en-US" },
         // xml: {encoding: "UTF-8"},
         link: selfLink,
         // "atom:link": selfLink,
-        updated: [new Date().toISOString()],
+        updated: new Date().toISOString(),
+        title: param_title,
+        subtitle: param_subtitle,
         entry: []
     };
     const param_noformat = get('format', false);
@@ -68,13 +78,8 @@ app.get('/', async (req, res) => {
         log(`Got ${param_urls.length} urls: ${param_urls.join()}`)
         const param_mode = req.query.mode || 'single'; // Default to 'single' if not specified
         log(`Mode: ${param_mode} | Format: ${param_noformat}`);
-        const param_title = req.query.title || `${param_urls.length} Atom Feeds`;
-        const param_subtitle = req.query.subtitle || `A combination of ${param_urls.length} Atom feeds`;
-        log(`Title: ${param_title} | Subtitle: ${param_subtitle}`);
 
         if (param_mode === 'single') {
-            combinedFeed.title = [param_title]; // Flattening the title array to a string
-            combinedFeed.subtitle = [param_subtitle]; // Flattening the subtitle array to a string
         }
 
         // log(combinedFeed);
@@ -97,10 +102,9 @@ app.get('/', async (req, res) => {
                         });
                         for (const entry of feedEntries) {
                             if (entry.title) entry.title = entry.title.toString().trim();
-                            // log(entry);
-                            // if (entry.summary) {
-                            //     log(entry.summary)
-                            // } // entry.summary[0]._ = entry.summary[0]._.toString().trim();
+                            if (entry.hasOwnProperty("summary")) {
+                                if (getText(entry.summary).strip() == "") delete o['summary'];
+                            }
                             combinedFeed.entry.push(entry);
                         }
                     } else {
