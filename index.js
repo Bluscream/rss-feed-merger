@@ -26,7 +26,7 @@ async function fetchAndCache(url) {
     return cachedData;
 }
 function log(msg) {
-    // console.log(msg);
+    console.log(msg);
     // if (process.env.DEBUG) {
     //     debug(msg);
     // }
