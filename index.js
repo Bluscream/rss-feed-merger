@@ -77,7 +77,7 @@ app.get('/', async (req, res) => {
             combinedFeed.subtitle = [param_subtitle]; // Flattening the subtitle array to a string
         }
 
-        log(combinedFeed);
+        // log(combinedFeed);
 
         for (const url of param_urls) {
             log(`Fetching ${url}...`);
@@ -97,17 +97,17 @@ app.get('/', async (req, res) => {
                         });
                         for (const entry of feedEntries) {
                             if (entry.title) entry.title = entry.title.toString().trim();
-                            log(entry);
-                            if (entry.summary) {
-                                log(entry.summary)
-                            } // entry.summary[0]._ = entry.summary[0]._.toString().trim();
+                            // log(entry);
+                            // if (entry.summary) {
+                            //     log(entry.summary)
+                            // } // entry.summary[0]._ = entry.summary[0]._.toString().trim();
                             combinedFeed.entry.push(entry);
                         }
                     } else {
                         log(`No <entry> elements in ${feed.title}`);
                     }
                 } else {
-                    throw ("mode not supported!");
+                    throw("mode not supported!");
                 }
             } else {
                 log(`No <feed> elements in ${url}`);
@@ -116,7 +116,6 @@ app.get('/', async (req, res) => {
 
         const xmlString = builder.buildObject(combinedFeed);
         log('Combined Atom feed ready to serve...');
-
         res.send(xmlString);
     } catch (error) {
         const err = error.toString();
