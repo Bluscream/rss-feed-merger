@@ -10,17 +10,20 @@ html(lang="en")
         e.preventDefault();
         const urlsInput = document.getElementById('urls');
         const urls = urlsInput.value.split('\n').map(url => encodeURIComponent(url.trim()));
+        console.log('Encoded URLs:', urls); // Log encoded URLs
         const urlCount = urls.length;
         const baseUrl = window.location.origin; // Use the current page's origin as the base URL
+        console.log('Base URL:', baseUrl); // Log base URL
         const params = new URLSearchParams({
           title: `${urlCount} Combined Feeds`,
           urls: urls.join(',')
         }).toString();
         const finalUrl = `${baseUrl}/?${params}`;
+        console.log('Final URL:', finalUrl); // Log final URL
         document.getElementById('result').value = finalUrl;
       });
   body
-  .container.mt-5
+ .container.mt-5
       h2 Generate URL
       form(id="generateForm")
         div.form-group
