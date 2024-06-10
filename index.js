@@ -88,7 +88,7 @@ app.get('/', async (req, res) => {
     }
     const reqUrl = req.protocol + '://' + req.get('host') + req.originalUrl;
     if (reqUrl === "http://rssmerge.onrender.com/" || reqUrl === "https://rssmerge.onrender.com/") {
-        res.render('p');
+        res.render('generatorPage');
         return;
     }
     log(`Request Url is ${reqUrl}`);
