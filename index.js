@@ -79,6 +79,8 @@ function displayGeneratorPage() {
 const app = express();
 const port = process.env.PORT || 9988;
 app.use(express.urlencoded({ extended: true }));
+app.set('views', './views'); // Set the views directory
+app.set('view engine', 'pug'); // Set Pug as the view engine
 
 app.get('/', async (req, res) => {
     function get_key(key, defaultValue = null) {
@@ -86,7 +88,7 @@ app.get('/', async (req, res) => {
     }
     const reqUrl = req.protocol + '://' + req.get('host') + req.originalUrl;
     if (reqUrl === "http://rssmerge.onrender.com/" || reqUrl === "https://rssmerge.onrender.com/") {
-        res.send(displayGeneratorPage());
+        res.render('p');
         return;
     }
     log(`Request Url is ${reqUrl}`);
