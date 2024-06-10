@@ -33,47 +33,13 @@ function log(msg) {
 function strip(value) {
     return value?.toString()?.trim() ?? null;
 }
+function decode(value) {
+    return decodeURI(value);
+}
 var getText = function (elt) {
     if (typeof (elt) === 'string') return elt;
     if (typeof (elt) === 'object' && elt.hasOwnProperty('_')) return elt._;
     return ''; // or whatever makes sense for your case
-}
-function displayGeneratorPage() {
-    return `
-        <!DOCTYPE html>
-        <html lang="en">
-        <head>
-            <meta charset="UTF-8">
-            <meta name="viewport" content="width=device-width, initial-scale=1.0">
-            <title>URL Generator</title>
-            <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
-        </head>
-        <body>
-            <div class="container mt-5">
-                <h2>Generate URL</h2>
-                <form id="generateForm">
-                    <div class="form-group">
-                        <label for="urls">Enter URLs (newline separated):</label>
-                        <textarea class="form-control" id="urls" rows="5"></textarea>
-                    </div>
-                    <button type="submit" class="btn btn-primary">Generate URL</button>
-                </form>
-                <div class="mt-3">
-                    <label for="result">Generated URL:</label>
-                    <input type="text" class="form-control" id="result" readonly>
-                </div>
-            </div>
-            <script>
-                document.getElementById('generateForm').addEventListener('submit', async (e) => {
-                    e.preventDefault();
-                    const urls = document.getElementById('urls').value;
-                    const resultElement = document.getElementById('result');
-                    // Implement logic to generate URL based on input and update resultElement.value
-                    resultElement.value = "Generated URL will go here"; // Placeholder
-                });
-            </script>
-        </body>
-        </html>`;
 }
 
 const app = express();
@@ -101,9 +67,31 @@ app.get('/', async (req, res) => {
         }
     }];
     let param_urls = get_key("urls");
-    if (param_urls) param_urls = param_urls.split(',');
-    else return;
-    log(`Got ${param_urls.length} urls: ${param_urls.join()}`)
+    if (param_urls) {
+        // Split the string into an array of URLs
+        param_urls = param_urls.split(',');
+    
+        // Decode each URL in the array and create a new array with the decoded URLs
+        param_urls = param_urls.map(url => {
+            try {
+                // Attempt to decode the URL
+                const decodedUrl = decodeURIComponent(url);
+                console.log(`Decoding URL: ${url} -> Decoded URL: ${decodedUrl}`);
+                return decodedUrl; // Return the decoded URL
+            } catch (error) {
+                // Log any errors that occur during decoding
+                console.error(`Error decoding URL: ${url}`, error);
+                return url; // Return the original URL if decoding fails
+            }
+        });
+    
+        // Update the original param_urls variable with the decoded URLs
+        param_urls = param_urls.join(','); // Join the array back into a comma-separated string
+    } else {
+        return;
+    }
+    
+    log(`Got ${param_urls.length} urls: ${param_urls}`);
     const param_title = get_key("title", `${param_urls.length} Atom Feeds`);
     const param_subtitle = get_key("subtitle", `A combination of ${param_urls.length} Atom feeds`);
     log(`Title: ${param_title} | Subtitle: ${param_subtitle}`);
