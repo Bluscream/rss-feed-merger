@@ -38,6 +38,43 @@ var getText = function (elt) {
     if (typeof (elt) === 'object' && elt.hasOwnProperty('_')) return elt._;
     return ''; // or whatever makes sense for your case
 }
+function displayGeneratorPage() {
+    return `
+        <!DOCTYPE html>
+        <html lang="en">
+        <head>
+            <meta charset="UTF-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <title>URL Generator</title>
+            <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+        </head>
+        <body>
+            <div class="container mt-5">
+                <h2>Generate URL</h2>
+                <form id="generateForm">
+                    <div class="form-group">
+                        <label for="urls">Enter URLs (newline separated):</label>
+                        <textarea class="form-control" id="urls" rows="5"></textarea>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Generate URL</button>
+                </form>
+                <div class="mt-3">
+                    <label for="result">Generated URL:</label>
+                    <input type="text" class="form-control" id="result" readonly>
+                </div>
+            </div>
+            <script>
+                document.getElementById('generateForm').addEventListener('submit', async (e) => {
+                    e.preventDefault();
+                    const urls = document.getElementById('urls').value;
+                    const resultElement = document.getElementById('result');
+                    // Implement logic to generate URL based on input and update resultElement.value
+                    resultElement.value = "Generated URL will go here"; // Placeholder
+                });
+            </script>
+        </body>
+        </html>`;
+}
 
 const app = express();
 const port = process.env.PORT || 9988;
@@ -48,7 +85,10 @@ app.get('/', async (req, res) => {
         return req.query[key] !== undefined ? req.query[key] : defaultValue;
     }
     const reqUrl = req.protocol + '://' + req.get('host') + req.originalUrl;
-    if (reqUrl === "http://rssmerge.onrender.com/") return;
+    if (reqUrl === "http://rssmerge.onrender.com/" || reqUrl === "https://rssmerge.onrender.com/") {
+        res.send(displayGeneratorPage());
+        return;
+    }
     log(`Request Url is ${reqUrl}`);
     // const reqUrlHash = crypto.createHash('md5').update(reqUrl).digest('hex');
     const selfLink = [{
