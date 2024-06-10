@@ -119,6 +119,7 @@ app.get('/', async (req, res) => {
         entry: []
     };
     const param_noformat = get_key('format', false);
+    const param_fixtitles = get_key('fixtitles', false);
     const builder = new Builder({ explicitRoot: true, rootName: "feed", renderOpts: { pretty: !param_noformat, indent: ' ', newline: '\n' } });
     let lastUrl = "";
     try {
@@ -131,7 +132,6 @@ app.get('/', async (req, res) => {
         }
 
         // log(combinedFeed);
-
         for (const url of param_urls) {
             try {
                 log(`Fetching ${url}...`);
@@ -157,7 +157,16 @@ app.get('/', async (req, res) => {
                                 }
                             });
                             for (const entry of feedEntries) {
-                                if (entry.title) entry.title = entry.title.toString().trim();
+                                if (entry.title && param_fixtitles) {
+                                    let title = entry.title;
+                                    if (Array.isArray(title) && title.length > 0) {
+                                        log(`entry.title ${title} is array!`);
+                                        // title = title.join(', ');
+                                    }
+                                    title = entry.title.toString().trim();
+                                    log(`entry.title ${title}`);
+                                    entry.title = title;
+                                }
                                 if (entry.hasOwnProperty("author")) {
                                     if (entry.author.hasOwnProperty("name")) {
                                         const txt = getText(entry.author.name);
