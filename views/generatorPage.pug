@@ -17,7 +17,7 @@ html(lang="en")
         const baseUrl = window.location.origin; // Use the current page's origin as the base URL
         console.log('Base URL:', baseUrl); // Log base URL
         const params = new URLSearchParams({
-          title: `${urlCount} Combined Feeds`,
+        //-   title: `${urlCount} Combined Feeds`,
           urls: urls.join(',')
         }).toString();
         const finalUrl = `${baseUrl}/?${params}`;

@@ -41,6 +41,17 @@ var getText = function (elt) {
     if (typeof (elt) === 'object' && elt.hasOwnProperty('_')) return elt._;
     return ''; // or whatever makes sense for your case
 }
+function isBaseURL(urlString) {
+    try {
+      const urlObj = new URL(urlString);
+      // Check if the URL has a pathname and if it matches '/'
+      // Also, ensure there are no query parameters
+      return urlObj.pathname === '/' && urlObj.search === '';
+    } catch (error) {
+      console.error(`Invalid URL: ${urlString}`);
+      return false; // Return false if the URL is invalid
+    }
+}
 
 const app = express();
 const port = process.env.PORT || 9988;
@@ -53,11 +64,12 @@ app.get('/', async (req, res) => {
         return req.query[key] !== undefined ? req.query[key] : defaultValue;
     }
     const reqUrl = req.protocol + '://' + req.get('host') + req.originalUrl;
-    if (reqUrl === "http://rssmerge.onrender.com/" || reqUrl === "https://rssmerge.onrender.com/") {
+    log(`Request Url is ${reqUrl}`);
+    if (isBaseURL(reqUrl)) {
+        log("Requested generatorPage")
         res.render('generatorPage');
         return;
     }
-    log(`Request Url is ${reqUrl}`);
     // const reqUrlHash = crypto.createHash('md5').update(reqUrl).digest('hex');
     const selfLink = [{
         $: {
@@ -75,7 +87,7 @@ app.get('/', async (req, res) => {
         param_urls = param_urls.map(url => {
             try {
                 // Attempt to decode the URL
-                const decodedUrl = decodeURIComponent(url);
+                const decodedUrl = decode(url);
                 console.log(`Decoding URL: ${url} -> Decoded URL: ${decodedUrl}`);
                 return decodedUrl; // Return the decoded URL
             } catch (error) {
@@ -86,14 +98,14 @@ app.get('/', async (req, res) => {
         });
     
         // Update the original param_urls variable with the decoded URLs
-        param_urls = param_urls.join(','); // Join the array back into a comma-separated string
+        // param_urls = param_urls.join(','); // Join the array back into a comma-separated string
     } else {
         return;
     }
     
     log(`Got ${param_urls.length} urls: ${param_urls}`);
-    const param_title = get_key("title", `${param_urls.length} Atom Feeds`);
-    const param_subtitle = get_key("subtitle", `A combination of ${param_urls.length} Atom feeds`);
+    const param_title = get_key("title", `${param_urls.length} RSS Feeds`);
+    const param_subtitle = get_key("subtitle", `A combination of ${param_urls.length}feeds`);
     log(`Title: ${param_title} | Subtitle: ${param_subtitle}`);
     let combinedFeed = {
         $: { xmlns: 'http://www.w3.org/2005/Atom', "xmlns:media": "http://search.yahoo.com/mrss/", "xml:lang": "en-US" },
