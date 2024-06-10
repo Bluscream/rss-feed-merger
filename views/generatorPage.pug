@@ -23,13 +23,13 @@ html(lang="en")
         document.getElementById('result').value = finalUrl;
       });
   body
-    .container.mt-5
-        h2 Generate URL
-        form(id="generateForm")
+  .container.mt-5
+      h2 Generate URL
+      form(id="generateForm")
         div.form-group
-            label(for="urls") Enter URLs (newline separated):
-            textarea.form-control#urls(rows="5")
+          label(for="urls") Enter URLs (newline separated):
+          textarea.form-control#urls(rows="5")
         button.btn.btn-primary(type="submit") Generate URL
-        div.mt-3
+      div.mt-3
         label(for="result") Generated URL:
         input.form-control#result(readonly)
