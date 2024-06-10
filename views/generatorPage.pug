@@ -6,9 +6,12 @@ html(lang="en")
     title URL Generator
     link(rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css")
     script.
+      function encode(inputString) {
+        return inputString.replace(/,/g, "%2C");
+      }
       function generateUrl() {
         const urlsInput = document.getElementById('urls');
-        const urls = urlsInput.value.split('\n').map(url => encodeURIComponent(url.trim()));
+        const urls = urlsInput.value.split('\n').map(url => encode(url.trim()));
         console.log('Encoded URLs:', urls); // Log encoded URLs
         const urlCount = urls.length;
         const baseUrl = window.location.origin; // Use the current page's origin as the base URL
